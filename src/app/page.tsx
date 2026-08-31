@@ -693,21 +693,6 @@ export default function Home() {
               ) : null}
             </div>
 
-            {/* Deploy card — light with orange accent */}
-            <div className="rounded-2xl border border-orange-200 bg-gradient-to-br from-orange-50 to-amber-50 shadow-sm p-6">
-              <h4 className="text-sm font-extrabold text-gray-900">พร้อม Deploy บน Vercel</h4>
-              <p className="text-sm text-gray-600 mt-1.5 leading-relaxed font-medium">โปรเจคนี้เป็น Next.js + Tailwind — push ขึ้น GitHub แล้ว Import ใน Vercel ได้ทันที (Framework preset: Next.js)</p>
-              <div className="mt-4 flex gap-2.5">
-                <a
-                  href="https://github.com/Guy2547/WED-PLC"
-                  target="_blank"
-                  className="text-xs px-4 py-2 rounded-full bg-orange-500 text-white font-bold shadow-md hover:bg-orange-600 hover:shadow-lg transition border border-orange-500"
-                >
-                  ดู GitHub
-                </a>
-                <span className="text-xs px-4 py-2 rounded-full bg-white border border-gray-200 text-gray-700 font-semibold shadow-sm">npx next build ผ่านแล้ว ✓</span>
-              </div>
-            </div>
           </div>
         </div>
 
