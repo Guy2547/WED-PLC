@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import {
   calcSubtraction,
   calcAdd,
@@ -137,8 +138,14 @@ export default function Home() {
             >
               GitHub
             </a>
-            <span className="px-4 py-2 rounded-full bg-orange-500 text-white font-semibold shadow-md">
-              เริ่มที่การลบเลขฐาน
+            <Link
+              href="/quiz"
+              className="px-4 py-2 rounded-full bg-orange-500 text-white font-semibold shadow-md hover:bg-orange-600 hover:shadow-lg transition"
+            >
+              🎯 Quiz 10 ข้อ
+            </Link>
+            <span className="hidden lg:inline-flex px-3 py-1.5 rounded-full bg-gray-900 text-white text-xs font-semibold shadow-sm">
+              ลบเลขฐาน
             </span>
           </div>
         </div>
@@ -702,6 +709,15 @@ export default function Home() {
               </div>
             </div>
           </div>
+        </div>
+
+        <div className="mt-8 flex justify-center">
+          <Link
+            href="/quiz"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 text-white font-extrabold shadow-md hover:shadow-lg hover:scale-[1.02] transition"
+          >
+            🎯 ลองทำ Quiz แปลงเลขฐาน 10 ข้อ →
+          </Link>
         </div>
 
         <footer className="mt-12 pt-6 border-t border-gray-200 text-center text-xs font-medium text-gray-500">
