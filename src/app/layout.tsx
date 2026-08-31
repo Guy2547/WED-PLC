@@ -31,7 +31,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} ${sarabun.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-gray-50 text-gray-800 font-sans">
-        {children}
+        <div className="flex-1 flex flex-col">{children}</div>
+        <footer className="w-full py-6 text-center text-sm text-gray-400">
+          จัดทำโดย อมรินทร์ ขวัญคีรี รหัสนักศึกษา 056860405008-4
+        </footer>
       </body>
     </html>
   );
