@@ -704,10 +704,6 @@ export default function Home() {
             🎯 ลองทำ Quiz แปลงเลขฐาน 10 ข้อ →
           </Link>
         </div>
-
-        <footer className="mt-12 pt-6 border-t border-gray-200 text-center text-xs font-medium text-gray-500">
-          © 2026 Handbook PLC — สร้างด้วย Next.js 16 + Tailwind CSS • รองรับฐาน 2–36 • เริ่มที่การลบเลขฐาน • ธีมสว่างสะอาด
-        </footer>
       </main>
     </div>
   );

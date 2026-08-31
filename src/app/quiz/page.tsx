@@ -773,7 +773,6 @@ export default function QuizPage() {
           </div>
         )}
 
-        <footer className="mt-10 text-center text-xs font-medium text-gray-500">© 2026 Handbook PLC • Number Base Quiz — 10 questions • Difficulty 1–10 • Base 2/8/10/16 + All</footer>
       </main>
     </div>
   );
