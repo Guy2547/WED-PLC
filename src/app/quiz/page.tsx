@@ -64,22 +64,40 @@ function normalizeAnswer(s: string): string {
   return t;
 }
 
+const ALL_BASES: number[] = [2, 8, 10, 16];
+
 function generateQuestions(difficulty: number, basesPool: number[], count = 10): Question[] {
   const cfg = DIFFICULTY[difficulty] ?? DIFFICULTY[5];
-  // fallback if pool invalid
-  const pool = basesPool.length >= 2 ? basesPool : [2, 8, 10, 16];
+  // fallback if pool empty
+  const pool = basesPool.length >= 1 ? basesPool : [2, 8, 10, 16];
   const qs: Question[] = [];
   for (let i = 0; i < count; i++) {
     const dec = randInt(0, cfg.max);
-    const fromBase = pool[randInt(0, pool.length - 1)];
-    let toBase = pool[randInt(0, pool.length - 1)];
-    let attempts = 0;
-    while (toBase === fromBase && attempts < 10) {
+    let fromBase: number;
+    let toBase: number;
+    if (pool.length === 1) {
+      // ฐานเดียวก็ทำได้: ให้ฐานที่เลือกสลับอยู่ทั้งฝั่ง from และ to สลับกับฐานอื่นแบบสุ่ม
+      const fixed = pool[0];
+      const others = ALL_BASES.filter((b) => b !== fixed);
+      const fromIsFixed = Math.random() < 0.5;
+      if (fromIsFixed) {
+        fromBase = fixed;
+        toBase = others[randInt(0, others.length - 1)];
+      } else {
+        fromBase = others[randInt(0, others.length - 1)];
+        toBase = fixed;
+      }
+    } else {
+      fromBase = pool[randInt(0, pool.length - 1)];
       toBase = pool[randInt(0, pool.length - 1)];
-      attempts++;
-    }
-    if (toBase === fromBase) {
-      toBase = pool.find((b) => b !== fromBase) ?? (fromBase === 10 ? 2 : 10);
+      let attempts = 0;
+      while (toBase === fromBase && attempts < 10) {
+        toBase = pool[randInt(0, pool.length - 1)];
+        attempts++;
+      }
+      if (toBase === fromBase) {
+        toBase = pool.find((b) => b !== fromBase) ?? (fromBase === 10 ? 2 : 10);
+      }
     }
     const fromValue = fromDecimalBigInt(BigInt(dec), fromBase);
     const toValue = normalizeAnswer(fromDecimalBigInt(BigInt(dec), toBase));
@@ -106,13 +124,13 @@ export default function QuizPage() {
 
   const current = questions[idx];
   const isAllSelected = selectedBases.length === 4 && [2, 8, 10, 16].every((b) => selectedBases.includes(b as BaseValue));
-  const canStart = selectedBases.length >= 2;
+  const canStart = selectedBases.length >= 1;
 
   const toggleBase = (b: BaseValue) => {
     setSelectedBases((prev) => {
       if (prev.includes(b)) {
         const next = prev.filter((x) => x !== b);
-        // allow 1 but will block start; keep at least 1 to avoid empty
+        // อนุญาตให้เหลือ 0 ได้ (จะแสดงว่ายังไม่เลือก) หรือเหลือ 1 ก็ทำ Quiz ได้แล้ว
         return next;
       } else {
         const next = [...prev, b].sort((a, c) => a - c) as BaseValue[];
@@ -128,7 +146,7 @@ export default function QuizPage() {
 
   const startQuiz = useCallback(() => {
     if (!canStart) {
-      setShowToast({ ok: false, msg: "กรุณาเลือกอย่างน้อย 2 ฐาน" });
+      setShowToast({ ok: false, msg: "กรุณาเลือกอย่างน้อย 1 ฐาน" });
       return;
     }
     const qs = generateQuestions(difficulty, selectedBases, 10);
@@ -369,7 +387,7 @@ export default function QuizPage() {
                       {selectedBases.length} selected
                     </span>
                   </div>
-                  <p className="text-xs text-gray-500 -mt-2">เลือกฐานที่ต้องการสุ่มใน Quiz (เลือกได้หลายฐาน, ต้อง ≥ 2 ฐาน)</p>
+                  <p className="text-xs text-gray-500 -mt-2">เลือกฐานที่ต้องการสุ่มใน Quiz — เลือกแค่ฐานเดียวก็ทำได้</p>
 
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     {BASE_OPTIONS.map((opt) => {
@@ -428,7 +446,7 @@ export default function QuizPage() {
                     <span className="text-xs text-gray-500">
                       Selected: <span className="font-mono font-bold text-gray-900">{selectedBases.length ? selectedBases.join(", ") : "—"}</span>
                     </span>
-                    {!canStart && <span className="text-xs font-bold text-red-600 bg-red-50 border border-red-200 rounded-full px-2.5 py-1">⚠ เลือกอย่างน้อย 2 ฐาน</span>}
+                    {!canStart && <span className="text-xs font-bold text-red-600 bg-red-50 border border-red-200 rounded-full px-2.5 py-1">⚠ เลือกอย่างน้อย 1 ฐาน</span>}
                   </div>
 
                   {/* Selected preview bar */}
@@ -445,7 +463,15 @@ export default function QuizPage() {
                         <span className="text-xs text-gray-500">— ยังไม่ได้เลือก —</span>
                       )}
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">{isAllSelected ? "Mixed สุ่มครบทุกฐาน" : `${selectedBases.length} bases • สุ่มเฉพาะฐานที่เลือก`}</div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      {selectedBases.length === 0
+                        ? "ยังไม่ได้เลือก"
+                        : isAllSelected
+                        ? "Mixed สุ่มครบทุกฐาน"
+                        : selectedBases.length === 1
+                        ? `สุ่มแบบเน้น ${baseLabel(selectedBases[0]).name} สลับกับฐานอื่น`
+                        : `${selectedBases.length} bases • สุ่มเฉพาะฐานที่เลือก`}
+                    </div>
                   </div>
                 </div>
 
@@ -470,7 +496,7 @@ export default function QuizPage() {
                         </div>
                       ))
                     ) : (
-                      <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">เลือกอย่างน้อย 2 ฐานเพื่อให้สร้างตัวอย่างได้</div>
+                      <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">เลือกอย่างน้อย 1 ฐานเพื่อให้สร้างตัวอย่างได้</div>
                     )}
                   </div>
                   <p className="text-xs text-gray-500 mt-2">* สุ่มใหม่ทุกครั้งที่กด Start • difficulty ควบคุมช่วงตัวเลข</p>
@@ -497,7 +523,8 @@ export default function QuizPage() {
             <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-6">
               <h4 className="text-sm font-extrabold text-gray-900">กติกา</h4>
               <ul className="mt-3 space-y-2 text-sm text-gray-600 list-disc pl-5 leading-relaxed">
-                <li>เลือก <span className="font-bold text-gray-900">Difficulty 1–10</span> และ <span className="font-bold text-orange-600">Base</span> ที่ต้องการก่อนเริ่ม (ต้อง ≥2 ฐาน)</li>
+                <li>เลือก <span className="font-bold text-gray-900">Difficulty 1–10</span> และ <span className="font-bold text-orange-600">Base</span> ที่ต้องการก่อนเริ่ม — เลือกแค่ฐานเดียวก็ทำได้</li>
+                <li>ถ้าเลือกฐานเดียว ระบบจะสุ่มให้ฐานนั้นสลับเป็นทั้งคำถามและคำตอบกับฐานอื่นโดยอัตโนมัติ</li>
                 <li>Quiz มี <span className="font-bold text-gray-900">10 ข้อ</span> สุ่มจาก pool ที่เลือกเท่านั้น</li>
                 <li>พิมพ์คำตอบแล้วกด <span className="font-semibold text-orange-600">Submit</span> → ตรวจทันทีพร้อมเฉลย</li>
                 <li>กด Enter เพื่อ Submit / Next ได้</li>
