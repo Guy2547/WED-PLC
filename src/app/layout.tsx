@@ -24,16 +24,29 @@ export const metadata: Metadata = {
     "เครื่องคำนวณเลขฐาน 2-36 เน้นการลบเลขฐาน พร้อมแสดงวิธียืมค่า (Borrow) ทีละหลัก — ธีมสว่างสะอาด ทันสมัย",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
+};
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="th"
-      className={`${geistSans.variable} ${geistMono.variable} ${sarabun.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${sarabun.variable} h-full antialiased overflow-x-hidden scroll-smooth`}
     >
-      <body className="min-h-full flex flex-col bg-gray-50 text-gray-800 font-sans">
-        <div className="flex-1 flex flex-col">{children}</div>
-        <footer className="w-full py-6 text-center text-sm text-gray-400">
-          จัดทำโดย อมรินทร์ ขวัญคีรี รหัสนักศึกษา 056860405008-4
+      <body className="min-h-screen w-full max-w-full overflow-x-hidden flex flex-col bg-gray-50 text-gray-800 font-sans text-sm md:text-base antialiased">
+        <div className="flex-1 flex flex-col w-full max-w-full overflow-x-hidden min-w-0">{children}</div>
+        <footer className="w-full max-w-full overflow-x-hidden px-4 sm:px-6 py-4 md:py-6 text-center text-xs sm:text-sm text-gray-400 break-words">
+          <div className="flex flex-wrap justify-center gap-x-3 gap-y-1">
+            <span>จัดทำโดย อมรินทร์ ขวัญคีรี รหัสนักศึกษา 056860405008-4</span>
+            <span className="hidden sm:inline">•</span>
+            <span>ณัฐพล ล่องทอง รหัสนักศึกษา 056860405067-0</span>
+            <span className="hidden sm:inline">•</span>
+            <span>อินทัช เวนานนท์ รหัสนักศึกษา 056960405159-3</span>
+          </div>
         </footer>
       </body>
     </html>
